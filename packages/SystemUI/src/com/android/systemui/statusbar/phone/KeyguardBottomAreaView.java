@@ -358,7 +358,11 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         if (mLeftAffordanceView == null) {
             return;
         }
+<<<<<<< HEAD
         boolean visible = mUserSetupComplete && !hideShortcuts();
+=======
+        boolean visible = mUserSetupComplete;
+>>>>>>> 307a8c2... SystemUI: Lockscreen shortcut customization
         if (visible) {
             if (isTargetCustom(Shortcuts.LEFT_SHORTCUT)) {
                 visible = !mShortcutHelper.isTargetEmpty(Shortcuts.LEFT_SHORTCUT);
@@ -374,7 +378,11 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
             // Things are not set up yet; reply hazy, ask again later
             return;
         }
+<<<<<<< HEAD
         boolean visible = mUserSetupComplete && !hideShortcuts();
+=======
+        boolean visible = mUserSetupComplete;
+>>>>>>> 307a8c2... SystemUI: Lockscreen shortcut customization
         if (visible) {
             if (isTargetCustom(Shortcuts.RIGHT_SHORTCUT)) {
                 visible = !mShortcutHelper.isTargetEmpty(Shortcuts.RIGHT_SHORTCUT);
@@ -391,7 +399,11 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         Drawable drawable;
         String contentDescription;
         boolean shouldGrayScale = false;
+<<<<<<< HEAD
         boolean visible = mUserSetupComplete && !hideShortcuts();
+=======
+        boolean visible = mUserSetupComplete;
+>>>>>>> 307a8c2... SystemUI: Lockscreen shortcut customization
         if (mShortcutHelper.isTargetCustom(Shortcuts.LEFT_SHORTCUT)) {
             drawable = mShortcutHelper.getDrawableForTarget(Shortcuts.LEFT_SHORTCUT);
             shouldGrayScale = true;
@@ -530,8 +542,12 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
 
     public void launchCamera(String source) {
         final Intent intent;
+<<<<<<< HEAD
         if (source.equals(CAMERA_LAUNCH_SOURCE_POWER_DOUBLE_TAP) || !mShortcutHelper
                 .isTargetCustom(LockscreenShortcutsHelper.Shortcuts.RIGHT_SHORTCUT)) {
+=======
+        if (!mShortcutHelper.isTargetCustom(LockscreenShortcutsHelper.Shortcuts.RIGHT_SHORTCUT)) {
+>>>>>>> 307a8c2... SystemUI: Lockscreen shortcut customization
             intent = getCameraIntent();
         } else {
             intent = mShortcutHelper.getIntent(LockscreenShortcutsHelper.Shortcuts.RIGHT_SHORTCUT);
@@ -701,6 +717,7 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         if (isTargetCustom(Shortcuts.RIGHT_SHORTCUT)) {
             mPreviewContainer.removeView(mCameraPreview);
         } else {
+<<<<<<< HEAD
             Intent cameraIntent = getCameraIntent();
             if (!Objects.equals(cameraIntent, mLastCameraIntent)) {
                 if (mCameraPreview != null) {
@@ -713,6 +730,11 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
             }
             mLastCameraIntent = cameraIntent;
             if (mCameraPreview != null) {
+=======
+            mCameraPreview = mPreviewInflater.inflatePreview(getCameraIntent());
+            if (mCameraPreview != null) {
+                mPreviewContainer.addView(mCameraPreview);
+>>>>>>> 307a8c2... SystemUI: Lockscreen shortcut customization
                 mCameraPreview.setVisibility(visibleBefore ? View.VISIBLE : View.INVISIBLE);
             }
         }
@@ -905,6 +927,7 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
     public void onChange() {
         updateCustomShortcuts();
     }
+<<<<<<< HEAD
 
     private boolean hideShortcuts() {
         boolean secure = mLockPatternUtils.isSecure(KeyguardUpdateMonitor.getCurrentUser());
@@ -913,3 +936,6 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
                 KeyguardUpdateMonitor.getCurrentUser()) != 0;
     }
 }
+=======
+}
+>>>>>>> 307a8c2... SystemUI: Lockscreen shortcut customization
