@@ -36,4 +36,6 @@
     <!-- QS title visibility -->
     <dimen name="qs_tile_height_wo_label">48dp</dimen>
 
+    <!-- Membar spacing -->
+    <dimen name="recents_membar_spacing">12dp</dimen>
 </resources>
