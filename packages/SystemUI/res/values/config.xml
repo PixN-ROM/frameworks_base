@@ -105,7 +105,11 @@
 
     <!-- Tiles native to System UI. Order should match "quick_settings_tiles_default" -->
     <string name="quick_settings_tiles_stock" translatable="false">
+<<<<<<< HEAD
         wifi,cell,battery,dnd,flashlight,rotation,bt,airplane,location,hotspot,inversion,saver,work,cast,night,ambient_display,sync,music,adb_network,screenshot,caffeine,brightness,reboot,ime,sound,nfc,heads_up,navigation_bar,expanded_desktop,androidauto
+=======
+        wifi,cell,battery,dnd,flashlight,rotation,bt,airplane,location,hotspot,inversion,saver,work,cast,night,ambient_display,sync,music,adb_network,screenshot,caffeine,brightness,reboot,ime,sound,nfc,heads_up,navigation_bar,expanded_desktop
+>>>>>>> 85af499... Expanded Desktop QS Tile
     </string>
 
     <!-- The tiles to display in QuickSettings -->

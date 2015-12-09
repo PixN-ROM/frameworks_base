@@ -2497,8 +2497,4 @@ public class NotificationPanelView extends PanelView implements
                 mContext.getContentResolver(), Settings.Secure.LOCK_QS_DISABLED, 0,
                 UserHandle.USER_CURRENT) != 0;
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 0501772... base: allow disabling quick settings on secure lock screens [1/2]
