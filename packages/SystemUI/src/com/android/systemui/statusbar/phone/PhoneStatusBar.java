@@ -518,6 +518,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             resolver.registerContentObserver(Settings.Secure.getUriFor(
                     Settings.Secure.LOCK_QS_DISABLED),
                     false, this, UserHandle.USER_ALL);
+<<<<<<< HEAD
            resolver.registerContentObserver(Settings.System.getUriFor(
                   Settings.System.QS_LAYOUT_COLUMNS),
                   false, this, UserHandle.USER_ALL);
@@ -528,6 +529,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                   Settings.System.QS_ROWS_LANDSCAPE),
                   false, this, UserHandle.USER_ALL);
            update();
+=======
+            update();
+>>>>>>> 0501772... base: allow disabling quick settings on secure lock screens [1/2]
         }
 
         @Override
@@ -560,6 +564,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             mDoubleTapVib = Settings.System.getIntForUser(mContext.getContentResolver(),
                     Settings.System.DOUBLE_TAP_VIBRATE, 1, UserHandle.USER_CURRENT) == 1;
 
+<<<<<<< HEAD
             mQsLayoutColumns = Settings.System.getIntForUser(resolver,
                     Settings.System.QS_LAYOUT_COLUMNS, 3, mCurrentUserId);
 
@@ -570,6 +575,11 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             if (mHeader != null) {
                 mHeader.updateSettings();
             }
+=======
+            if (mNotificationPanel != null) {
+                mNotificationPanel.updateSettings();
+            }
+>>>>>>> 0501772... base: allow disabling quick settings on secure lock screens [1/2]
         }
     }
 

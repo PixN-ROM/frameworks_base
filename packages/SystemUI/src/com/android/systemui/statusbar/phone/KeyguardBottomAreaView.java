@@ -359,10 +359,14 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
             return;
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
         boolean visible = mUserSetupComplete && !hideShortcuts();
 =======
         boolean visible = mUserSetupComplete;
 >>>>>>> 307a8c2... SystemUI: Lockscreen shortcut customization
+=======
+        boolean visible = mUserSetupComplete && !hideShortcuts();
+>>>>>>> 0501772... base: allow disabling quick settings on secure lock screens [1/2]
         if (visible) {
             if (isTargetCustom(Shortcuts.LEFT_SHORTCUT)) {
                 visible = !mShortcutHelper.isTargetEmpty(Shortcuts.LEFT_SHORTCUT);
@@ -379,10 +383,14 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
             return;
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
         boolean visible = mUserSetupComplete && !hideShortcuts();
 =======
         boolean visible = mUserSetupComplete;
 >>>>>>> 307a8c2... SystemUI: Lockscreen shortcut customization
+=======
+        boolean visible = mUserSetupComplete && !hideShortcuts();
+>>>>>>> 0501772... base: allow disabling quick settings on secure lock screens [1/2]
         if (visible) {
             if (isTargetCustom(Shortcuts.RIGHT_SHORTCUT)) {
                 visible = !mShortcutHelper.isTargetEmpty(Shortcuts.RIGHT_SHORTCUT);
@@ -400,10 +408,14 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         String contentDescription;
         boolean shouldGrayScale = false;
 <<<<<<< HEAD
+<<<<<<< HEAD
         boolean visible = mUserSetupComplete && !hideShortcuts();
 =======
         boolean visible = mUserSetupComplete;
 >>>>>>> 307a8c2... SystemUI: Lockscreen shortcut customization
+=======
+        boolean visible = mUserSetupComplete && !hideShortcuts();
+>>>>>>> 0501772... base: allow disabling quick settings on secure lock screens [1/2]
         if (mShortcutHelper.isTargetCustom(Shortcuts.LEFT_SHORTCUT)) {
             drawable = mShortcutHelper.getDrawableForTarget(Shortcuts.LEFT_SHORTCUT);
             shouldGrayScale = true;
@@ -928,6 +940,9 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         updateCustomShortcuts();
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 0501772... base: allow disabling quick settings on secure lock screens [1/2]
 
     private boolean hideShortcuts() {
         boolean secure = mLockPatternUtils.isSecure(KeyguardUpdateMonitor.getCurrentUser());
@@ -935,7 +950,10 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
                 mContext.getContentResolver(), Settings.Secure.LOCK_QS_DISABLED, 0,
                 KeyguardUpdateMonitor.getCurrentUser()) != 0;
     }
+<<<<<<< HEAD
 }
 =======
+=======
+>>>>>>> 0501772... base: allow disabling quick settings on secure lock screens [1/2]
 }
 >>>>>>> 307a8c2... SystemUI: Lockscreen shortcut customization
