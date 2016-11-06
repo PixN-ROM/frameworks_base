@@ -3721,6 +3721,12 @@ public final class Settings {
         public static final String DOUBLE_TAP_VIBRATE = "double_tap_vibrate";
 
         /**
+         * Change the delay when a screenshot is taken
+         * @hide
+         */
+        public static final String SCREENSHOT_DELAY = "screenshot_delay";
+
+        /**
          * Enable/disable overwrite default value for ambient display
          * @hide
          */
