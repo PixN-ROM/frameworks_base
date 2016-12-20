@@ -1585,11 +1585,11 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         return lp;
     }
 
-    @Override
+/*   @Override
     public void screenPinningStateChanged(boolean enabled) {
         mNavigationController.screenPinningStateChanged(enabled);
     }
-
+*/
     @Override
     public void setIcon(String slot, StatusBarIcon icon) {
         mIconController.setIcon(slot, icon);

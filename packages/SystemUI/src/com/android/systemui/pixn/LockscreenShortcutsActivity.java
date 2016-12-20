@@ -1,8 +1,8 @@
-package com.android.systemui.flash;
+package com.android.systemui.pixn;
 
-import com.android.settingslib.flash.ShortcutPickHelper;
+import com.android.settingslib.pixn.ShortcutPickHelper;
 import com.android.systemui.R;
-import com.android.systemui.flash.LockscreenShortcutsHelper.Shortcuts;
+import com.android.systemui.pixn.LockscreenShortcutsHelper.Shortcuts;
 
 import android.app.Activity;
 import android.app.AlertDialog;

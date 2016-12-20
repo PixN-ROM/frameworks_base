@@ -61,6 +61,7 @@ public class Clock extends TextView implements DemoMode {
     protected SimpleDateFormat mClockFormat;
     private SimpleDateFormat mContentDescriptionFormat;
     protected Locale mLocale;
+ 	private boolean mScreenOn = true;
 
     public static final int AM_PM_STYLE_GONE    = 0;
     public static final int AM_PM_STYLE_SMALL   = 1;

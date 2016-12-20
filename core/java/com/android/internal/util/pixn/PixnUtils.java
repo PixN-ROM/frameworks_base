@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package com.android.internal.util.flash;
+package com.android.internal.util.pixn;
 
 import android.content.res.Resources;
 
 import java.util.Locale;
 
-public class FlashUtils {
+public class PixnUtils {
 
     public static boolean isChineseLanguage() {
        return Resources.getSystem().getConfiguration().locale.getLanguage().startsWith(
