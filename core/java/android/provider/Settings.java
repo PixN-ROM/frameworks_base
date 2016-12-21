@@ -350,7 +350,6 @@ public final class Settings {
      * Input: Nothing.
      * <p>
      * Output: Nothing.
-
      */
     @SdkConstant(SdkConstantType.ACTIVITY_INTENT_ACTION)
     public static final String ACTION_WIFI_SETTINGS =
@@ -3619,7 +3618,7 @@ public final class Settings {
         };
 
         /**
-         * Beginning of Flash System Settings Additions
+         * Beginning of PixN System Settings Additions
          * @hide
          */
 
@@ -7342,7 +7341,7 @@ public final class Settings {
         public static final String WEB_ACTION_ENABLED = "web_action_enabled";
 
         /**
-         * Beginning of Flash Secure Settings Additions
+         * Beginning of PixN Secure Settings Additions
          * @hide
          */
 
@@ -9947,7 +9946,7 @@ public final class Settings {
         public static final String DATABASE_DOWNGRADE_REASON = "database_downgrade_reason";
 
         /**
-         * Beginning of Flash Global Settings Additions
+         * Beginning of PixN Global Settings Additions
          * @hide
          */
 
