@@ -3845,10 +3845,10 @@ public final class Settings {
         public static final String LOCKSCREEN_ROTATION = "lockscreen_rotation";
 
           /**
-          * Whether to show the battery info on the lockscreen while charging
+          * Whether to show the negociated charger current in the lockscreen
           * @hide
           */
-         public static final String LOCKSCREEN_BATTERY_INFO = "lockscreen_battery_info";
+         public static final String LOCKSCREEN_CHARGING_CURRENT = "lockscreen_charging_current";
  
         /**
          * Network traffic indicator, goes from least to greatest significant bitwise
