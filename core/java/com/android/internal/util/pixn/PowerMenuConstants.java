@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 The CyanogenMod Project
+ * Copyright (C) 2016 PixN Rom
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.android.internal.util.flash;
+package com.android.internal.util.pixn;
 
 /* Master list of all actions for the power menu */
 public class PowerMenuConstants {

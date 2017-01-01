@@ -2434,7 +2434,7 @@ public class NotificationPanelView extends PanelView implements
         mGroupManager = groupManager;
     }
 
-	class SettingsObserver extends ContentObserver {
+    class SettingsObserver extends ContentObserver {
         SettingsObserver(Handler handler) {
             super(handler);
         }

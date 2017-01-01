@@ -1422,7 +1422,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         mWasTorchActive = false;
         mIsTorchActive = true;
         mPowerKeyHandled = true;
-        }		
+        }       
     }
 
     private void backLongPress() {
