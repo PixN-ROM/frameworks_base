@@ -7273,6 +7273,11 @@ public final class Settings {
          */
         public static final String ADB_PORT = "adb_port";
 
+        /**
+         * Launch actions for left/right lockscreen targets
+         * @hide
+         */
+        public static final String LOCKSCREEN_TARGETS = "lockscreen_target_actions";
 
         /**
          * Status bar battery %
