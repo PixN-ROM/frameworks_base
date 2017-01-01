@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2016 The Pure Nexus Project
  * Copyright (C) 2016 Flash ROM
+ * Copyright (C) 2016 PixN ROM
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +16,13 @@
  * limitations under the License.
  */
 
-package com.android.internal.util.flash;
+package com.android.internal.util.pixn;
 
 import android.content.res.Resources;
 
 import java.util.Locale;
 
-public class FlashUtils {
+public class PixNUtils {
 
     public static boolean isChineseLanguage() {
        return Resources.getSystem().getConfiguration().locale.getLanguage().startsWith(

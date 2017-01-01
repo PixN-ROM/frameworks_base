@@ -40,6 +40,10 @@ import android.view.SurfaceSession;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Transformation;
+import android.os.Handler;
+import android.os.Message;
+import com.android.server.DisplayThread;
+import android.os.Looper;
 
 import java.io.PrintWriter;
 
@@ -147,6 +151,7 @@ class ScreenRotationAnimation {
     private boolean mMoreStartExit;
     private boolean mMoreStartFrame;
     long mHalfwayPoint;
+    final H mHandler = new H(DisplayThread.get().getLooper());
 
     public void printTo(String prefix, PrintWriter pw) {
         pw.print(prefix); pw.print("mSurface="); pw.print(mSurfaceControl);
@@ -286,6 +291,12 @@ class ScreenRotationAnimation {
                 mSurfaceControl.setAlpha(0);
                 mSurfaceControl.show();
                 sur.destroy();
+                // If screenshot layer stays for more than freeze
+                // timeout value with no updates on the screen,
+                // destroy the layer explicitly.
+                mHandler.removeMessages(H.SCREENSHOT_FREEZE_TIMEOUT);
+                mHandler.sendEmptyMessageDelayed(H.SCREENSHOT_FREEZE_TIMEOUT,
+                                           H.FREEZE_TIMEOUT_VAL);
             } catch (OutOfResourcesException e) {
                 Slog.w(TAG, "Unable to allocate freeze surface", e);
             }
