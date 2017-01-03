@@ -275,7 +275,7 @@
         </activity>
 
         <activity
-            android:name=".flash.LockscreenShortcutsActivity"
+            android:name=".pixn.LockscreenShortcutsActivity"
             android:icon="@drawable/tuner"
             android:label="@string/lockscreen_targets_message"
             android:theme="@android:style/Theme.Material.Settings"
