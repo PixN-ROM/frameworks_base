@@ -84,7 +84,7 @@ import java.util.List;
  */
 public class FingerprintService extends SystemService implements IBinder.DeathRecipient {
     static final String TAG = "FingerprintService";
-    static final boolean DEBUG = true;
+    static final boolean DEBUG = false;
     private static final String FP_DATA_DIR = "fpdata";
     private static final String FINGERPRINTD = "android.hardware.fingerprint.IFingerprintDaemon";
     private static final int MSG_USER_SWITCHING = 10;
@@ -371,8 +371,10 @@ public class FingerprintService extends SystemService implements IBinder.DeathRe
     private void startClient(ClientMonitor newClient, boolean initiatedByClient) {
         ClientMonitor currentClient = mCurrentClient;
         if (currentClient != null) {
-            if (DEBUG) Slog.v(TAG, "request stop current client " + currentClient.getOwnerString());
-            currentClient.stop(initiatedByClient);
+            if(!currentClient.getIsCanceling()) {
+                if (DEBUG) Slog.v(TAG, "request stop current client " + currentClient.getOwnerString());
+                currentClient.stop(initiatedByClient);
+            }
             mPendingClient = newClient;
             mHandler.removeCallbacks(mResetClientState);
             mHandler.postDelayed(mResetClientState, CANCEL_TIMEOUT_LIMIT);

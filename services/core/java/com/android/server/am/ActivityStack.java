@@ -1806,7 +1806,7 @@ final class ActivityStack {
                     // them. However, when they don't have the wallpaper behind them, we want to
                     // show activities in the next application stack behind them vs. another
                     // task in the home stack like recents.
-                    behindFullscreenActivity = true;
+                    behindFullscreenActivity = task.getTopActivity() != null;
                 } else if (task.isRecentsTask()
                         && task.getTaskToReturnTo() == APPLICATION_ACTIVITY_TYPE) {
                     if (DEBUG_VISIBILITY) Slog.v(TAG_VISIBILITY,
@@ -3197,7 +3197,8 @@ final class ActivityStack {
     }
 
     private void adjustFocusedActivityLocked(ActivityRecord r, String reason) {
-        if (!mStackSupervisor.isFocusedStack(this) || mService.mFocusedActivity != r) {
+        if (!mStackSupervisor.isFocusedStack(this) || (mService.mFocusedActivity != r
+                && mService.mFocusedActivity != null)) {
             return;
         }
 
@@ -3212,7 +3213,7 @@ final class ActivityStack {
                 return;
             } else {
                 final TaskRecord task = r.task;
-                if (r.frontOfTask && task == topTask() && task.isOverHomeStack()) {
+                if (r.frontOfTask && task.isOverHomeStack()) {
                     final int taskToReturnTo = task.getTaskToReturnTo();
 
                     // For non-fullscreen stack, we want to move the focus to the next visible

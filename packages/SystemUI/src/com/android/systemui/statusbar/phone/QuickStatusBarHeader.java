@@ -18,15 +18,25 @@ package com.android.systemui.statusbar.phone;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.ContentUris;
 import android.content.Context;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RippleDrawable;
+import android.net.Uri;
 import android.os.UserManager;
+import android.os.Vibrator;
+import android.provider.AlarmClock;
+import android.provider.CalendarContract;
+import android.provider.CalendarContract.Events;
+import android.os.UserManager;
+import android.provider.Settings;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -47,10 +57,9 @@ import com.android.systemui.statusbar.policy.NextAlarmController;
 import com.android.systemui.statusbar.policy.NextAlarmController.NextAlarmChangeCallback;
 import com.android.systemui.statusbar.policy.UserInfoController;
 import com.android.systemui.statusbar.policy.UserInfoController.OnUserInfoChangedListener;
-import com.android.systemui.tuner.TunerService;
 
 public class QuickStatusBarHeader extends BaseStatusBarHeader implements
-        NextAlarmChangeCallback, OnClickListener, OnUserInfoChangedListener {
+        NextAlarmChangeCallback, OnClickListener, OnLongClickListener, OnUserInfoChangedListener {
 
     private static final String TAG = "QuickStatusBarHeader";
 
@@ -58,11 +67,12 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
 
     private ActivityStarter mActivityStarter;
     private NextAlarmController mNextAlarmController;
-    private SettingsButton mSettingsButton;
-    protected View mSettingsContainer;
+    private View mSettingsButton;
 
     private TextView mAlarmStatus;
     private View mAlarmStatusCollapsed;
+    private View mClock;
+    private View mDate;
 
     private QSPanel mQsPanel;
 
@@ -71,6 +81,7 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
 
     private ViewGroup mDateTimeGroup;
     private ViewGroup mDateTimeAlarmGroup;
+    private ViewGroup mDateTimeAlarmCenterGroup;
     private TextView mEmergencyOnly;
 
     protected ExpandableIndicator mExpandIndicator;
@@ -91,6 +102,13 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
     private View mEdit;
     private boolean mShowFullAlarm;
     private float mDateTimeTranslation;
+    protected Vibrator mVibrator;
+
+    private boolean hasSettingsIcon;
+    private boolean hasEdit;
+    private boolean hasExpandIndicator;
+    private boolean hasMultiUserSwitch;
+    private boolean mDateTimeGroupCenter;
 
     public QuickStatusBarHeader(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -108,26 +126,38 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
 
         mDateTimeAlarmGroup = (ViewGroup) findViewById(R.id.date_time_alarm_group);
         mDateTimeAlarmGroup.findViewById(R.id.empty_time_view).setVisibility(View.GONE);
+        mDateTimeAlarmCenterGroup = (ViewGroup) findViewById(R.id.date_time_alarm_center_group);
+        mDateTimeAlarmCenterGroup.setVisibility(View.GONE);
         mDateTimeGroup = (ViewGroup) findViewById(R.id.date_time_group);
         mDateTimeGroup.setPivotX(0);
         mDateTimeGroup.setPivotY(0);
         mDateTimeTranslation = getResources().getDimension(R.dimen.qs_date_time_translation);
+        mClock = findViewById(R.id.clock);
+        mClock.setOnClickListener(this);
+        mClock.setOnLongClickListener(this);
+        mDate = findViewById(R.id.date);
+        mDate.setOnClickListener(this);
+        mDate.setOnLongClickListener(this);
+
         mShowFullAlarm = getResources().getBoolean(R.bool.quick_settings_show_full_alarm);
 
         mExpandIndicator = (ExpandableIndicator) findViewById(R.id.expand_indicator);
 
         mHeaderQsPanel = (QuickQSPanel) findViewById(R.id.quick_qs_panel);
 
-        mSettingsButton = (SettingsButton) findViewById(R.id.settings_button);
-        mSettingsContainer = findViewById(R.id.settings_button_container);
+        mSettingsButton = findViewById(R.id.settings_button);
         mSettingsButton.setOnClickListener(this);
+        mSettingsButton.setOnLongClickListener(this);
 
         mAlarmStatusCollapsed = findViewById(R.id.alarm_status_collapsed);
         mAlarmStatus = (TextView) findViewById(R.id.alarm_status);
         mAlarmStatus.setOnClickListener(this);
 
         mMultiUserSwitch = (MultiUserSwitch) findViewById(R.id.multi_user_switch);
+        mMultiUserSwitch.setOnLongClickListener(this);
         mMultiUserAvatar = (ImageView) mMultiUserSwitch.findViewById(R.id.multi_user_avatar);
+
+        mVibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
 
         // RenderThread is doing more harm than good when touching the header (to expand quick
         // settings), so disable it for this view
@@ -135,6 +165,12 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
         ((RippleDrawable) mExpandIndicator.getBackground()).setForceSoftware(true);
 
         updateResources();
+    }
+
+    public void vibrateheader(int duration) {
+        if (mVibrator != null) {
+            if (mVibrator.hasVibrator()) { mVibrator.vibrate(duration); }
+        }
     }
 
     @Override
@@ -182,6 +218,17 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
             });
         } else {
             mDateTimeGroup.setPivotX(isRtl ? mDateTimeGroup.getWidth() : 0);
+        }
+    }
+
+    private void updateDateTimeCenter() {
+        mDateTimeGroupCenter = isDateTimeGroupCenter();
+        if (mDateTimeGroupCenter && !(hasSettingsIcon && hasEdit && hasMultiUserSwitch && hasExpandIndicator)) {
+            mDateTimeAlarmGroup.setVisibility(View.GONE);
+            mDateTimeAlarmCenterGroup.setVisibility(View.VISIBLE);
+        } else {
+            mDateTimeAlarmCenterGroup.setVisibility(View.GONE);
+            mDateTimeAlarmGroup.setVisibility(View.VISIBLE);
         }
     }
 
@@ -267,17 +314,23 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
         updateDateTimePosition();
         mEmergencyOnly.setVisibility(mExpanded && mShowEmergencyCallsOnly
                 ? View.VISIBLE : View.INVISIBLE);
-        mSettingsContainer.findViewById(R.id.tuner_icon).setVisibility(
-                TunerService.isTunerEnabled(mContext) ? View.VISIBLE : View.INVISIBLE);
         final boolean isDemo = UserManager.isDeviceInDemoMode(mContext);
-        mMultiUserSwitch.setVisibility(mExpanded && mMultiUserSwitch.hasMultipleUsers() && !isDemo
-                ? View.VISIBLE : View.INVISIBLE);
-        mEdit.setVisibility(isDemo || !mExpanded ? View.INVISIBLE : View.VISIBLE);
+        hasMultiUserSwitch = !isMultiUserSwitchDisabled();
+        mMultiUserSwitch.setVisibility(mExpanded && hasMultiUserSwitch && !isDemo
+                ? View.VISIBLE : View.GONE);
+        mMultiUserAvatar.setVisibility(hasMultiUserSwitch ? View.VISIBLE : View.GONE);
+        hasEdit = !isEditDisabled();
+        mEdit.setVisibility(hasEdit && !isDemo && mExpanded ? View.VISIBLE : View.GONE);
+        hasSettingsIcon = !isSettingsIconDisabled();
+        mSettingsButton.setVisibility(hasSettingsIcon ? View.VISIBLE : View.GONE);
+        hasExpandIndicator = !isExpandIndicatorDisabled();
+        mExpandIndicator.setVisibility(hasExpandIndicator ? View.VISIBLE : View.GONE);
     }
 
     private void updateDateTimePosition() {
         mDateTimeAlarmGroup.setTranslationY(mShowEmergencyCallsOnly
                 ? mExpansionAmount * mDateTimeTranslation : 0);
+        updateDateTimeCenter();
     }
 
     private void updateListeners() {
@@ -323,33 +376,73 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
             MetricsLogger.action(mContext,
                     mExpanded ? MetricsProto.MetricsEvent.ACTION_QS_EXPANDED_SETTINGS_LAUNCH
                             : MetricsProto.MetricsEvent.ACTION_QS_COLLAPSED_SETTINGS_LAUNCH);
-            if (mSettingsButton.isTunerClick()) {
-                mHost.startRunnableDismissingKeyguard(() -> post(() -> {
-                    if (TunerService.isTunerEnabled(mContext)) {
-                        TunerService.showResetRequest(mContext, () -> {
-                            // Relaunch settings so that the tuner disappears.
-                            startSettingsActivity();
-                        });
-                    } else {
-                        Toast.makeText(getContext(), R.string.tuner_toast,
-                                Toast.LENGTH_LONG).show();
-                        TunerService.setTunerEnabled(mContext, true);
-                    }
-                    startSettingsActivity();
-
-                }));
-            } else {
-                startSettingsActivity();
-            }
+            startSettingsActivity();
         } else if (v == mAlarmStatus && mNextAlarm != null) {
             PendingIntent showIntent = mNextAlarm.getShowIntent();
             mActivityStarter.startPendingIntentDismissingKeyguard(showIntent);
+        } else if (v == mClock) {
+            startClockActivity();
+        } else if (v == mDate) {
+            startDateActivity();
         }
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        if (v == mClock) {
+            startClockLongClickActivity();
+        } else if (v == mDate) {
+            startDateLongClickActivity();
+        } else if (v == mMultiUserSwitch) {
+            startUserLongClickActivity();
+        } else if (v == mSettingsButton) {
+            startSettingsLongClickActivity();
+        }
+        vibrateheader(20);
+        return false;
     }
 
     private void startSettingsActivity() {
         mActivityStarter.startActivity(new Intent(android.provider.Settings.ACTION_SETTINGS),
                 true /* dismissShade */);
+    }
+
+    private void startSettingsLongClickActivity() {
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+	intent.setClassName("com.android.settings",
+            "com.android.settings.Settings$FlashSettingsActivity");
+        mActivityStarter.startActivity(intent, true /* dismissShade */);
+    }
+
+    private void startClockActivity() {
+        mActivityStarter.startActivity(new Intent(AlarmClock.ACTION_SHOW_ALARMS),
+                true /* dismissShade */);
+    }
+
+    private void startClockLongClickActivity() {
+        mActivityStarter.startActivity(new Intent(AlarmClock.ACTION_SET_ALARM),
+                true /* dismissShade */);
+    }
+
+    private void startDateActivity() {
+        Uri.Builder builder = CalendarContract.CONTENT_URI.buildUpon();
+        builder.appendPath("time");
+        ContentUris.appendId(builder, System.currentTimeMillis());
+        Intent intent = new Intent(Intent.ACTION_VIEW).setData(builder.build());
+        mActivityStarter.startActivity(intent, true /* dismissShade */);
+    }
+
+    private void startDateLongClickActivity() {
+        Intent intent = new Intent(Intent.ACTION_INSERT);
+            intent.setData(Events.CONTENT_URI);
+        mActivityStarter.startActivity(intent, true /* dismissShade */);
+    }
+
+    private void startUserLongClickActivity() {
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.setClassName("com.android.settings",
+            "com.android.settings.Settings$UserSettingsActivity");
+        mActivityStarter.startActivity(intent, true /* dismissShade */);
     }
 
     @Override
@@ -386,5 +479,40 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
     @Override
     public void onUserInfoChanged(String name, Drawable picture) {
         mMultiUserAvatar.setImageDrawable(picture);
+    }
+
+    @Override
+    public void updateSettings() {
+        if (mQsPanel != null) {
+            mQsPanel.updateSettings();
+        }
+        if (mHeaderQsPanel != null) {
+            mHeaderQsPanel.updateSettings();
+        }
+    }
+
+    public boolean isSettingsIconDisabled() {
+        return Settings.System.getInt(mContext.getContentResolver(),
+            Settings.System.QS_SETTINGS_ICON_TOGGLE, 0) == 1;
+    }
+
+    public boolean isEditDisabled() {
+        return Settings.System.getInt(mContext.getContentResolver(),
+            Settings.System.QS_EDIT_TOGGLE, 0) == 1;
+    }
+
+    public boolean isExpandIndicatorDisabled() {
+        return Settings.System.getInt(mContext.getContentResolver(),
+            Settings.System.QS_EXPAND_INDICATOR_TOGGLE, 0) == 1;
+    }
+
+    public boolean isMultiUserSwitchDisabled() {
+        return Settings.System.getInt(mContext.getContentResolver(),
+            Settings.System.QS_MULTIUSER_SWITCH_TOGGLE, 0) == 1;
+    }
+
+    public boolean isDateTimeGroupCenter() {
+        return Settings.System.getInt(mContext.getContentResolver(),
+            Settings.System.QS_DATE_TIME_CENTER, 0) == 1;
     }
 }

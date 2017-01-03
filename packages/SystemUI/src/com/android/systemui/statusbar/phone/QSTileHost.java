@@ -40,20 +40,35 @@ import com.android.systemui.qs.QSTile;
 import com.android.systemui.qs.external.CustomTile;
 import com.android.systemui.qs.external.TileLifecycleManager;
 import com.android.systemui.qs.external.TileServices;
+import com.android.systemui.qs.tiles.AdbOverNetworkTile;
 import com.android.systemui.qs.tiles.AirplaneModeTile;
+import com.android.systemui.qs.tiles.AmbientDisplayTile;
+import com.android.systemui.qs.tiles.AndroidAutoTile;
 import com.android.systemui.qs.tiles.BatteryTile;
 import com.android.systemui.qs.tiles.BluetoothTile;
+import com.android.systemui.qs.tiles.BrightnessTile;
+import com.android.systemui.qs.tiles.CaffeineTile;
 import com.android.systemui.qs.tiles.CastTile;
 import com.android.systemui.qs.tiles.CellularTile;
 import com.android.systemui.qs.tiles.ColorInversionTile;
 import com.android.systemui.qs.tiles.DataSaverTile;
 import com.android.systemui.qs.tiles.DndTile;
+import com.android.systemui.qs.tiles.ExpandedDesktopTile;
 import com.android.systemui.qs.tiles.FlashlightTile;
+import com.android.systemui.qs.tiles.HeadsUpTile;
 import com.android.systemui.qs.tiles.HotspotTile;
+import com.android.systemui.qs.tiles.ImeTile;
 import com.android.systemui.qs.tiles.IntentTile;
 import com.android.systemui.qs.tiles.LocationTile;
+import com.android.systemui.qs.tiles.MusicTile;
+import com.android.systemui.qs.tiles.NfcTile;
 import com.android.systemui.qs.tiles.NightDisplayTile;
+import com.android.systemui.qs.tiles.NavigationBarTile;
+import com.android.systemui.qs.tiles.RebootTile;
 import com.android.systemui.qs.tiles.RotationLockTile;
+import com.android.systemui.qs.tiles.ScreenshotTile;
+import com.android.systemui.qs.tiles.SoundTile;
+import com.android.systemui.qs.tiles.SyncTile;
 import com.android.systemui.qs.tiles.UserTile;
 import com.android.systemui.qs.tiles.WifiTile;
 import com.android.systemui.qs.tiles.WorkModeTile;
@@ -433,6 +448,21 @@ public class QSTileHost implements QSTile.Host, Tunable {
         else if (tileSpec.equals("battery")) return new BatteryTile(this);
         else if (tileSpec.equals("saver")) return new DataSaverTile(this);
         else if (tileSpec.equals("night")) return new NightDisplayTile(this);
+        else if (tileSpec.equals("ambient_display")) return new AmbientDisplayTile(this);
+        else if (tileSpec.equals("adb_network")) return new AdbOverNetworkTile(this);
+        else if (tileSpec.equals("brightness")) return new BrightnessTile(this);
+        else if (tileSpec.equals("caffeine")) return new CaffeineTile(this);
+        else if (tileSpec.equals("heads_up")) return new HeadsUpTile(this);
+        else if (tileSpec.equals("ime")) return new ImeTile(this);
+        else if (tileSpec.equals("music")) return new MusicTile(this);
+        else if (tileSpec.equals("nfc")) return new NfcTile(this);
+        else if (tileSpec.equals("reboot")) return new RebootTile(this);
+        else if (tileSpec.equals("screenshot")) return new ScreenshotTile(this);
+        else if (tileSpec.equals("sound")) return new SoundTile(this);
+        else if (tileSpec.equals("sync")) return new SyncTile(this);
+        else if (tileSpec.equals("navigation_bar")) return new NavigationBarTile(this);
+        else if (tileSpec.equals("expanded_desktop")) return new ExpandedDesktopTile(this);
+        else if (tileSpec.equals("androidauto")) return new AndroidAutoTile(this);
         // Intent tiles.
         else if (tileSpec.startsWith(IntentTile.PREFIX)) return IntentTile.create(this,tileSpec);
         else if (tileSpec.startsWith(CustomTile.PREFIX)) return CustomTile.create(this,tileSpec);
@@ -449,6 +479,13 @@ public class QSTileHost implements QSTile.Host, Tunable {
             tileList = res.getString(R.string.quick_settings_tiles);
             if (DEBUG) Log.d(TAG, "Loaded tile specs from config: " + tileList);
         } else {
+            for (String tile : res.getString(R.string.quick_settings_tiles).split(",")) {
+                tile = tile.trim();
+                if (tile.isEmpty()) continue;
+                if(tile.startsWith(IntentTile.PREFIX)){
+                    tileList = tileList.concat(",").concat(tile);
+                }
+            }
             if (DEBUG) Log.d(TAG, "Loaded tile specs from setting: " + tileList);
         }
         final ArrayList<String> tiles = new ArrayList<String>();

@@ -143,6 +143,8 @@ import com.android.server.LocalServices;
 import com.android.server.UiThread;
 import com.android.server.Watchdog;
 import com.android.server.input.InputManagerService;
+import com.android.server.lights.Light;
+import com.android.server.lights.LightsManager;
 import com.android.server.policy.PhoneWindowManager;
 import com.android.server.power.ShutdownThread;
 
@@ -721,9 +723,9 @@ public class WindowManagerService extends IWindowManager.Stub
     PowerManager mPowerManager;
     PowerManagerInternal mPowerManagerInternal;
 
-    float mWindowAnimationScaleSetting = 1.0f;
-    float mTransitionAnimationScaleSetting = 1.0f;
-    float mAnimatorDurationScaleSetting = 1.0f;
+    float mWindowAnimationScaleSetting = 0.5f;
+    float mTransitionAnimationScaleSetting = 0.5f;
+    float mAnimatorDurationScaleSetting = 0.5f;
     boolean mAnimationsDisabled = false;
 
     final InputManagerService mInputManager;
@@ -5769,6 +5771,11 @@ public class WindowManagerService extends IWindowManager.Stub
         mPointerEventDispatcher.unregisterInputEventListener(listener);
     }
 
+    @Override
+    public void addSystemUIVisibilityFlag(int flags) {
+        mLastStatusBarVisibility |= flags;
+    }
+
     // Called by window manager policy. Not exposed externally.
     @Override
     public int getLidState() {
@@ -5823,12 +5830,6 @@ public class WindowManagerService extends IWindowManager.Stub
     @Override
     public void shutdown(boolean confirm) {
         ShutdownThread.shutdown(mContext, PowerManager.SHUTDOWN_USER_REQUESTED, confirm);
-    }
-
-    // Called by window manager policy.  Not exposed externally.
-    @Override
-    public void reboot(boolean confirm) {
-        ShutdownThread.reboot(mContext, PowerManager.SHUTDOWN_USER_REQUESTED, confirm);
     }
 
     // Called by window manager policy.  Not exposed externally.
@@ -6085,6 +6086,17 @@ public class WindowManagerService extends IWindowManager.Stub
 
         mPolicy.enableScreenAfterBoot();
 
+        // clear any intrusive lighting which may still be on from the
+        // crypto landing ui
+        LightsManager lm = LocalServices.getService(LightsManager.class);
+        Light batteryLight = lm.getLight(LightsManager.LIGHT_ID_BATTERY);
+        Light notifLight = lm.getLight(LightsManager.LIGHT_ID_NOTIFICATIONS);
+        if (batteryLight != null) {
+            batteryLight.turnOff();
+        }
+        if (notifLight != null) {
+            notifLight.turnOff();
+        }
         // Make sure the last requested orientation has been applied.
         updateRotationUnchecked(false, false);
     }
@@ -10413,6 +10425,11 @@ public class WindowManagerService extends IWindowManager.Stub
                 mInputMonitor.updateInputWindowsLw(true);
             }
         }
+    }
+
+    @Override
+    public boolean needsNavigationBar() {
+        return mPolicy.needsNavigationBar();
     }
 
     @Override
