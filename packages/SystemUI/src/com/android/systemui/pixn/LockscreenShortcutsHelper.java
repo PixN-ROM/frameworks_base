@@ -1,4 +1,4 @@
-package com.android.systemui.flash;
+package com.android.systemui.pixn;
 
 import android.content.Context;
 import android.content.Intent;
